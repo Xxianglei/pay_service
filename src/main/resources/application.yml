@@ -1,0 +1,17 @@
+server:
+  port: 58081
+
+
+#指定注册中心地址
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}}/pay_service/
+
+
+#服务的名称
+spring:
+  application:
+    name: pay-service
