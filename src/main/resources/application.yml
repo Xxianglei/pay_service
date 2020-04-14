@@ -1,20 +1,11 @@
 server:
   port: 9003
 
-#
-#指定注册中心地址
-eureka:
-  instance:
-    hostname: 106.54.75.24
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port} # 指定实例ID,就不会显示主机名
-    ip-address: 39.105.82.150
-  client:
-    serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:9000/eureka/
-
-
 #服务的名称
 spring:
   application:
     name: pay-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 120.26.184.125:8848
