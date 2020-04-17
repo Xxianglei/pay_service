@@ -5,7 +5,41 @@ server:
 spring:
   application:
     name: pay-service
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    # 当前数据源操作类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://121.199.28.140:3306/BS_XIANGLEI?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 123456
+    # 初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+  session:
+    ## Spring Session配置
+    store-type: redis
+    timeout: PT30M
+  redis:
+    host: 121.199.28.140
+    port: 6379
+    password:
+    timeout: PT30M
   cloud:
     nacos:
       discovery:
         server-addr: 120.26.184.125:8848
+
+# 日志打印
+logging:
+  path: /data/logs/${spring.application.name}
+rocketmq:
+  name-server: 120.26.184.125:9876
+  producer:
+    group: order-group
