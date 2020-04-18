@@ -8,67 +8,67 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@TableName("BS_PARK")
+@TableName(value ="BS_PARK")
 public class BsPark implements Serializable, Cloneable {
     /**
      *
      */
-    @TableId
+    @TableId("FLOW_ID")
     private String flowId;
     /**
      * 停车场名字
      */
-    @TableField
+    @TableField("PARK_NAME")
     private String parkName;
     /**
      * 白天价格
      */
-    @TableField
+    @TableField("B_PRICE")
     private Double bPrice;
     /**
      * 晚上价格
      */
-    @TableField
+    @TableField("Y_PRICE")
     private Double yPrice;
     /**
      * vip用户的价格
      */
-    @TableField
+    @TableField("V_PRICE")
     private Double vPrice;
     /**
      * 停车场最大容量
      */
-    @TableField
+    @TableField("VOLUME")
     private Integer volume;
     /**
      * 已经停放的车辆数
      */
-    @TableField
+    @TableField("IN_USED")
     private Integer inUsed;
     /**
      * 地址
      */
-    @TableField
+    @TableField("LOCATION")
     private String location;
     /**
      * 经度
      */
-    @TableField
+    @TableField("JD")
     private Double jd;
     /**
      * 维度
      */
-    @TableField
+    @TableField("WD")
     private Double wd;
     /**
      * 默认日期
      */
-    @TableField
+    @TableField("CREATE_DATE")
     private Date createDate;
     /**
      * 计费策略（冗余）
      */
-    @TableField
+    @TableField("STRATAGE")
     private String stratage;
 
     public String getFlowId() {

@@ -7,42 +7,42 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
 
-@TableName("BS_PARK_INFO")
+@TableName(value ="BS_PARK_INFO")
 public class BsParkInfo implements Serializable, Cloneable {
     /**
      * 车位id
      */
-    @TableId
+    @TableId("FLOW_ID")
     private String flowId;
     /**
      * 该停车位编号
      */
-    @TableField
+    @TableField("PARK_NUM")
     private String parkNum;
     /**
      * 0/1/2 不可用/有车/预约
      */
-    @TableField
+    @TableField("STATUS")
     private String status;
     /**
      * 车位长度
      */
-    @TableField
+    @TableField("LENGTH")
     private Double length;
     /**
      * 车位宽度
      */
-    @TableField
+    @TableField("WIDTH")
     private Double width;
     /**
      * 停车场id
      */
-    @TableField
+    @TableField("PARK_ID")
     private String parkId;
     /**
      * 临时拥有者
      */
-    @TableField
+    @TableField("TEMP_OWNER")
     private String tempOwner;
     public String getFlowId() {
         return flowId;

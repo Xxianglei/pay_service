@@ -7,56 +7,56 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
 
-@TableName("BS_ORDER")
+@TableName(value ="BS_ORDER")
 public class BsOrder implements Serializable, Cloneable {
     
-    @TableId
+    @TableId("FLOW_ID")
     private String flowId;
     /**
      * 用户id
      */
-    @TableField
+    @TableField("USER_ID")
     private String userId;
     /**
      * 订单创建时间
      */
-    @TableField
+    @TableField("CREATE_TIME")
     private Date createTime;
     /**
      * 开始时间
      */
-    @TableField
+    @TableField("START_TIME")
     private Date startTime;
     /**
      * 离开时间
      */
-    @TableField
+    @TableField("LEAVE_TIME")
     private Date leaveTime;
     /**
      * 0/1 白天/夜间
      */
-    @TableField
+    @TableField("EVENING")
     private String evening;
     /**
      * 车牌号
      */
-    @TableField
+    @TableField("CAR_NUM")
     private String carNum;
     /**
      * 停车场id
      */
-    @TableField
+    @TableField("PARK_ID")
     private String parkId;
     /**
      * 订单状态
      */
-    @TableField
+    @TableField("CHARGE")
     private String charge;
 
     /**
      * 车位id
      */
-    @TableField
+    @TableField("PARK_INFO_ID")
     private String parkInfoId;
 
     public String getFlowId() {

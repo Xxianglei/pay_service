@@ -8,62 +8,62 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@TableName("BS_USER")
+@TableName(value ="BS_USER")
 public class BsUser implements Serializable, Cloneable {
     /**
      * 流水号
      */
-    @TableId
+    @TableId("FLOW_ID")
     private String flowId;
     /**
      * 姓名
      */
-    @TableField
+    @TableField("NAME")
     private String name;
     /**
      * 密码
      */
-    @TableField
+    @TableField("PASSWORD")
     private String password;
     /**
      * 账号
      */
-    @TableField
+    @TableField("ACCOUNT")
     private String account;
     /**
      * 创建时间
      */
-    @TableField
+    @TableField("CREATE_DATE")
     private Date createDate;
     /**
      * 手机号
      */
-    @TableField
+    @TableField("PHONE")
     private String phone;
     /**
      * 0/1下线/上线
      */
-    @TableField
+    @TableField("STATUS")
     private String status;
     /**
      * 0/1 会员/非会员
      */
-    @TableField
+    @TableField("VIP")
     private String vip;
     /**
      * 是否是超级管理员
      */
-    @TableField
+    @TableField("SUPER_ROOT")
     private String superRoot;
     /**
      * 年龄
      */
-    @TableField
+    @TableField("AGE")
     private Integer age;
     /**
      * 性别0/1 男/女
      */
-    @TableField
+    @TableField("SEXY")
     private String sexy;
 
     public String getFlowId() {

@@ -14,13 +14,13 @@ import java.util.Date;
  * com.xianglei.charge_service.domain
  * @Description:
  */
-@TableName("BS_MESSAGE")
+@TableName(value ="BS_MESSAGE")
 public class BsMessage implements Serializable {
-    @TableId
+    @TableId("FLOW_ID")
     String flowId;
-    @TableField
+    @TableField("CREATE_DATE")
     Date createDate;
-    @TableField
+    @TableField("TX_ID")
     String txId;
 
     public String getFlowId() {

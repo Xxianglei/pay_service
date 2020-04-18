@@ -2,6 +2,7 @@ package com.xianglei.charge_service.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xianglei.charge_service.domain.BsMessage;
+import org.springframework.stereotype.Repository;
 
 /**
  * @Auther: Xianglei
@@ -10,5 +11,6 @@ import com.xianglei.charge_service.domain.BsMessage;
  * com.xianglei.charge_service.mapper
  * @Description:消息幂等查询接口
  */
+@Repository
 public interface MessageMapper extends BaseMapper<BsMessage> {
 }

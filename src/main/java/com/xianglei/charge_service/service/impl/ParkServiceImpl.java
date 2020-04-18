@@ -1,13 +1,11 @@
 package com.xianglei.charge_service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xianglei.charge_service.domain.BsOrder;
-import com.xianglei.charge_service.domain.BsPark;
-import com.xianglei.charge_service.domain.BsUserCar;
-import com.xianglei.charge_service.domain.PreOrder;
+import com.xianglei.charge_service.domain.*;
 import com.xianglei.charge_service.mapper.CarMapper;
 import com.xianglei.charge_service.mapper.OrderMapper;
 import com.xianglei.charge_service.mapper.ParkMapper;
+import com.xianglei.charge_service.mapper.UserMapper;
 import com.xianglei.charge_service.service.ParkService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ public class ParkServiceImpl implements ParkService {
     OrderMapper orderMapper;
     @Autowired
     CarMapper carMapper;
+    @Autowired
+    UserMapper userMapper;
 
     @Override
     public List<PreOrder> getPark(String name) {
@@ -46,8 +46,11 @@ public class ParkServiceImpl implements ParkService {
             for (BsOrder bsOrder : bsOrders) {
                 PreOrder preOrder = new PreOrder();
                 preOrder.setParkName(name);
+                BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
+                preOrder.setName(bsUser.getName());
                 preOrder.setCreateDate(bsOrder.getCreateTime());
                 preOrder.setEndDate(bsOrder.getLeaveTime());
+                preOrder.setStartDate(bsOrder.getStartTime());
                 preOrder.setParKNo(bsOrder.getParkInfoId());
                 preOrder.setCarNum(bsOrder.getCarNum());
                 // 获取车辆色号
@@ -57,11 +60,18 @@ public class ParkServiceImpl implements ParkService {
             }
         } else {
             //查询所有的订单 按创建时间倒叙
-            List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<>());
+            List<BsOrder> bsOrders = orderMapper.selectList(null);
             for (BsOrder bsOrder : bsOrders) {
+                // 当前订单的停车场
+                String parkId = bsOrder.getParkId();
                 PreOrder preOrder = new PreOrder();
-                preOrder.setParkName(name);
+                BsPark bsPark = parkMapper.selectOne(new QueryWrapper<BsPark>().eq("FLOW_ID", parkId));
+                preOrder.setParkName(bsPark.getParkName());
+                // 下单人名字
+                BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
+                preOrder.setName(bsUser.getName());
                 preOrder.setCreateDate(bsOrder.getCreateTime());
+                preOrder.setStartDate(bsOrder.getStartTime());
                 preOrder.setEndDate(bsOrder.getLeaveTime());
                 preOrder.setParKNo(bsOrder.getParkInfoId());
                 preOrder.setCarNum(bsOrder.getCarNum());

@@ -43,3 +43,5 @@ rocketmq:
   name-server: 120.26.184.125:9876
   producer:
     group: order-group
+mybatis:
+  type-aliases-package: com.xianglei.charge_service.domain

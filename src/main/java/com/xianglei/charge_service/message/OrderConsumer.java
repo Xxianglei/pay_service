@@ -1,5 +1,6 @@
 package com.xianglei.charge_service.message;
 
+
 import com.xianglei.charge_service.common.utils.Tools;
 import com.xianglei.charge_service.domain.BsMessage;
 import com.xianglei.charge_service.domain.BsOrder;

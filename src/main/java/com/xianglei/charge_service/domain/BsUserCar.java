@@ -7,32 +7,32 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
 
-@TableName("BS_USER_CAR")
+@TableName(value ="BS_USER_CAR")
 public class BsUserCar implements Serializable, Cloneable {
     /**
      *
      */
-    @TableId
+    @TableId("FLOW_ID")
     private String flowId;
     /**
      * 车牌号
      */
-    @TableField
+    @TableField("CAR_NUM")
     private String carNum;
     /**
      * 颜色
      */
-    @TableField
+    @TableField("COLOR")
     private String color;
     /**
      * 车型号
      */
-    @TableField
+    @TableField("MODEL")
     private String model;
     /**
      * 车主id
      */
-    @TableField
+    @TableField("USER_ID")
     private String userId;
 
     public String getFlowId() {
