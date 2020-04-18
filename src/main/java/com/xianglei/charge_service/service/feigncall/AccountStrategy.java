@@ -1,7 +1,5 @@
 package com.xianglei.charge_service.service.feigncall;
 
-import org.springframework.cloud.openfeign.FeignClient;
-
 /**
  * @Auther: Xianglei
  * @Company: xxx
@@ -9,6 +7,6 @@ import org.springframework.cloud.openfeign.FeignClient;
  * com.xianglei.charge_service.service.feigncall
  * @Description:远程调用计费策略
  */
-@FeignClient
+/*@FeignClient*/
 public interface AccountStrategy {
 }

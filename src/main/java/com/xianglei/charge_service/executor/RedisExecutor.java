@@ -37,7 +37,6 @@ public class RedisExecutor {
                 0L, TimeUnit.MILLISECONDS,
                 containerQueue, threadFactory, new ThreadPoolExecutor.AbortPolicy());
     }
-
     /**
      * 从消息队列中取订单信息插入到批量数据库
      *
@@ -58,5 +57,4 @@ public class RedisExecutor {
         }
         return result;
     }
-
 }
