@@ -35,7 +35,8 @@ spring:
     nacos:
       discovery:
         server-addr: 120.26.184.125:8848
-
+        port: 9003
+        ip: 39.105.82.150
 # 日志打印
 logging:
   path: /data/logs/${spring.application.name}
