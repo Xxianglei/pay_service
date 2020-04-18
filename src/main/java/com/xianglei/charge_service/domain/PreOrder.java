@@ -1,5 +1,7 @@
 package com.xianglei.charge_service.domain;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 /**
@@ -13,11 +15,14 @@ public class PreOrder {
     String name;
     String carNum;
     String color;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Date createDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Date startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Date endDate;
     String parkName;
-    String parKNo;
+    String parkNo;
 
     public String getName() {
         return name;
@@ -75,11 +80,11 @@ public class PreOrder {
         this.parkName = parkName;
     }
 
-    public String getParKNo() {
-        return parKNo;
+    public String getParkNo() {
+        return parkNo;
     }
 
-    public void setParKNo(String parKNo) {
-        this.parKNo = parKNo;
+    public void setParkNo(String parkNo) {
+        this.parkNo = parkNo;
     }
 }
