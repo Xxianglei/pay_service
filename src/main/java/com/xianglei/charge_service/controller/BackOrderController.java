@@ -34,7 +34,7 @@ public class BackOrderController {
      * @return
      */
     @RequestMapping("/viewOrder")
-    public BaseJson ViewOrder(@RequestParam String parkName) {
+    public BaseJson ViewOrder(@RequestParam("parkName") String parkName) {
         BaseJson baseJson = new BaseJson(true);
         List<PreOrder> park = parkService.getPark(parkName);
         baseJson.setData(park);
