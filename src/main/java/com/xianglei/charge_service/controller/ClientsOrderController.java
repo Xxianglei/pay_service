@@ -3,6 +3,7 @@ package com.xianglei.charge_service.controller;
 import com.xianglei.charge_service.common.BaseJson;
 import com.xianglei.charge_service.common.utils.Tools;
 import com.xianglei.charge_service.domain.BsOrder;
+import com.xianglei.charge_service.domain.PreBsOrder;
 import com.xianglei.charge_service.message.OrderProducer;
 import com.xianglei.charge_service.service.OrderService;
 import org.apache.commons.lang.StringUtils;
@@ -96,7 +97,7 @@ public class ClientsOrderController {
             logger.error("用户Id不可为空");
             return new BaseJson(false, "用户Id不可为空");
         } else {
-            List<BsOrder> myOrders = orderService.getMyOrders(userId, chargeStatus);
+            List<PreBsOrder>  myOrders = orderService.getMyOrders(userId, chargeStatus);
             baseJson.setData(myOrders);
             baseJson.setCode(200);
             baseJson.setMessage("查询成功");

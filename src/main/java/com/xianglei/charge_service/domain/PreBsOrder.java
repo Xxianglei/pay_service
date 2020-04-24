@@ -1,66 +1,58 @@
 package com.xianglei.charge_service.domain;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.io.Serializable;
-import java.util.Date;
 
-@TableName(value ="BS_ORDER")
-public class BsOrder implements Serializable, Cloneable {
-    
-    @TableId("FLOW_ID")
+public class PreBsOrder implements Serializable, Cloneable {
+
     private String flowId;
     /**
      * 用户id
      */
-    @TableField("USER_ID")
     private String userId;
     /**
      * 订单创建时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField("CREATE_TIME")
-    private Date createTime;
+    private String createTime;
     /**
      * 开始时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField("START_TIME")
-    private Date startTime;
+    private String startTime;
     /**
      * 离开时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @TableField("LEAVE_TIME")
-    private Date leaveTime;
+    private String leaveTime;
+    /**
+     * 离开时间
+     */
+    private String parkName;
+    /**
+     * 离开时间
+     */
+    private String location;
+    /**
+     * 离开时间
+     */
+    private Double price;
     /**
      * 0/1 白天/夜间
      */
-    @TableField("EVENING")
     private String evening;
     /**
      * 车牌号
      */
-    @TableField("CAR_NUM")
     private String carNum;
     /**
      * 停车场id
      */
-    @TableField("PARK_ID")
     private String parkId;
     /**
      * 订单状态
      */
-    @TableField("CHARGE")
     private String charge;
 
     /**
      * 车位id
      */
-    @TableField("PARK_INFO_ID")
     private String parkInfoId;
 
     public String getFlowId() {
@@ -79,20 +71,52 @@ public class BsOrder implements Serializable, Cloneable {
         this.userId = userId;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 
-    public Date getLeaveTime() {
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getLeaveTime() {
         return leaveTime;
     }
 
-    public void setLeaveTime(Date leaveTime) {
+    public void setLeaveTime(String leaveTime) {
         this.leaveTime = leaveTime;
+    }
+
+    public String getParkName() {
+        return parkName;
+    }
+
+    public void setParkName(String parkName) {
+        this.parkName = parkName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public String getEvening() {
@@ -134,14 +158,4 @@ public class BsOrder implements Serializable, Cloneable {
     public void setParkInfoId(String parkInfoId) {
         this.parkInfoId = parkInfoId;
     }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-
 }

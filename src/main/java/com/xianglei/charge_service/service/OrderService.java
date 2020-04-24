@@ -1,6 +1,7 @@
 package com.xianglei.charge_service.service;
 
 import com.xianglei.charge_service.domain.BsOrder;
+import com.xianglei.charge_service.domain.PreBsOrder;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface OrderService {
 
     int deleteOrders(List<String> flows);
 
-    List<BsOrder> getMyOrders(String userId, String status);
+    List<PreBsOrder>  getMyOrders(String userId, String status);
 
     int updateOrder(BsOrder bsOrder);
 

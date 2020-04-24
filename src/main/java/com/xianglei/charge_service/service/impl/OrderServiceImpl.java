@@ -4,16 +4,21 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xianglei.charge_service.common.DateEnum;
 import com.xianglei.charge_service.common.OrderStatusEnum;
+import com.xianglei.charge_service.common.utils.DateUtils;
 import com.xianglei.charge_service.common.utils.Tools;
 import com.xianglei.charge_service.domain.BsOrder;
+import com.xianglei.charge_service.domain.BsPark;
 import com.xianglei.charge_service.domain.BsParkInfo;
+import com.xianglei.charge_service.domain.PreBsOrder;
 import com.xianglei.charge_service.mapper.OrderMapper;
 import com.xianglei.charge_service.mapper.ParkInfoMapper;
+import com.xianglei.charge_service.mapper.ParkMapper;
 import com.xianglei.charge_service.service.OrderService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     OrderMapper orderMapper;
     @Autowired
     ParkInfoMapper parkInfoMapper;
+    @Autowired
+    ParkMapper parkMapper;
 
     @Override
     public int deleteOrders(List<String> flowIds) {
@@ -42,12 +49,13 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<BsOrder> getMyOrders(String userId, String status) {
+    public List<PreBsOrder> getMyOrders(String userId, String status) {
         QueryWrapper<BsOrder> bsOrderQueryWrapper = new QueryWrapper<>();
         bsOrderQueryWrapper.eq("USER_ID", userId);
         if (!StringUtils.isEmpty(status)) {
-            bsOrderQueryWrapper.eq("CHARGE", userId);
+            bsOrderQueryWrapper.eq("CHARGE", status);
         }
+        List<PreBsOrder> list=new ArrayList<>();
         List<BsOrder> bsOrders = orderMapper.selectList(bsOrderQueryWrapper);
         for (BsOrder bsOrder : bsOrders) {
             if ("0".equals(bsOrder.getCharge())) {
@@ -62,8 +70,37 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 bsOrder.setEvening(DateEnum.NIGHT.getName());
             }
+            PreBsOrder preBsOrder = new PreBsOrder();
+            // 时间格式化
+            if (bsOrder.getStartTime() != null && bsOrder.getLeaveTime() != null && bsOrder.getCreateTime() != null) {
+                String startTime = DateUtils.format(bsOrder.getStartTime(), "yyyy-MM-dd HH:mm:ss");
+                preBsOrder.setStartTime(startTime);
+                String endTime = DateUtils.format(bsOrder.getLeaveTime(), "yyyy-MM-dd HH:mm:ss");
+                preBsOrder.setLeaveTime(endTime);
+                String createTime = DateUtils.format(bsOrder.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
+                preBsOrder.setCreateTime(createTime);
+            }
+            String parkId = bsOrder.getParkId();
+            // 获取停车场对象
+            BsPark bsPark = parkMapper.selectById(parkId);
+            // 获取停车场名字
+            String parkName = bsPark.getParkName();
+            preBsOrder.setParkName(parkName);
+            // 获取停车场位置
+            String location = bsPark.getLocation();
+            preBsOrder.setLocation(location);
+            // todo 价格计算
+            preBsOrder.setPrice(10.20);
+            preBsOrder.setFlowId(bsOrder.getFlowId());
+            preBsOrder.setUserId(userId);
+            preBsOrder.setCarNum(bsOrder.getCarNum());
+            preBsOrder.setParkInfoId(bsOrder.getParkInfoId());
+            preBsOrder.setParkId(bsOrder.getParkId());
+            preBsOrder.setEvening(bsOrder.getEvening());
+            preBsOrder.setCharge(bsOrder.getCharge());
+            list.add(preBsOrder);
         }
-        return bsOrders;
+        return list;
     }
 
     @Override
