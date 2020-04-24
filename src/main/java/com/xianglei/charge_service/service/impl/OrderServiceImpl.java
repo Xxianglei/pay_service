@@ -49,11 +49,12 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<PreBsOrder> getMyOrders(String userId, String status) {
+    public List<PreBsOrder> getMyOrders(String userId, String orderId) {
         QueryWrapper<BsOrder> bsOrderQueryWrapper = new QueryWrapper<>();
         bsOrderQueryWrapper.eq("USER_ID", userId);
-        if (!StringUtils.isEmpty(status)) {
-            bsOrderQueryWrapper.eq("CHARGE", status);
+        bsOrderQueryWrapper.orderByDesc("CREATE_TIME");
+        if (!StringUtils.isEmpty(orderId)) {
+            bsOrderQueryWrapper.eq("FLOW_ID", orderId);
         }
         List<PreBsOrder> list=new ArrayList<>();
         List<BsOrder> bsOrders = orderMapper.selectList(bsOrderQueryWrapper);

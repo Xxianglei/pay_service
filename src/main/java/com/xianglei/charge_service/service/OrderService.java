@@ -16,7 +16,7 @@ public interface OrderService {
 
     int deleteOrders(List<String> flows);
 
-    List<PreBsOrder>  getMyOrders(String userId, String status);
+    List<PreBsOrder>  getMyOrders(String userId, String orderId);
 
     int updateOrder(BsOrder bsOrder);
 

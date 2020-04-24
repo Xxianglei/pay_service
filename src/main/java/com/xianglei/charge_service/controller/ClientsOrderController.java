@@ -91,13 +91,13 @@ public class ClientsOrderController {
      * @return
      */
     @RequestMapping("/viewOrder")
-    public BaseJson ViewOrder(@RequestParam String userId, String chargeStatus) {
+    public BaseJson ViewOrder(@RequestParam String userId, String orderId) {
         BaseJson baseJson = new BaseJson(true);
         if (StringUtils.isEmpty(userId)) {
             logger.error("用户Id不可为空");
             return new BaseJson(false, "用户Id不可为空");
         } else {
-            List<PreBsOrder>  myOrders = orderService.getMyOrders(userId, chargeStatus);
+            List<PreBsOrder>  myOrders = orderService.getMyOrders(userId, orderId);
             baseJson.setData(myOrders);
             baseJson.setCode(200);
             baseJson.setMessage("查询成功");
