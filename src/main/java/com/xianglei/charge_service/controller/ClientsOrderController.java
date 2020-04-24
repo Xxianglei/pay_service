@@ -78,8 +78,6 @@ public class ClientsOrderController {
             baseJson.setStatus(true);
         } catch (Exception e) {
             baseJson.setMessage("删除出错");
-        } finally {
-            baseJson.setMessage("删除出错");
         }
         return baseJson;
     }

@@ -17,6 +17,7 @@ import com.xianglei.charge_service.service.OrderService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     ParkMapper parkMapper;
 
+    @Transactional
     @Override
     public int deleteOrders(List<String> flowIds) {
         int nums = orderMapper.deleteBatchIds(flowIds);
@@ -158,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
         QueryWrapper<BsParkInfo> objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("FLOW_ID", flowId);
         BsParkInfo parkInfo = parkInfoMapper.selectOne(objectQueryWrapper);
-        parkInfo.setStatus("2");
+        parkInfo.setStatus("1");
         // 临时拥有者设置为空
         parkInfo.setTempOwner("");
         return parkInfoMapper.updateById(parkInfo);
