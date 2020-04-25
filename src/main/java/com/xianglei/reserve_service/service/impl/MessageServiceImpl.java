@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 21:03
- * com.xianglei.charge_service.service.impl
+ * com.xianglei.reserve_service.service.impl
  * @Description:
  */
 @Service

@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 18:47
- * com.xianglei.charge_service.executor
+ * com.xianglei.reserve_service.executor
  * @Description:线程方法批量插入数据库
  */
 @Component

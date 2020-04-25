@@ -21,7 +21,7 @@ import java.util.List;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/14 13:55
- * com.xianglei.charge_service.controller
+ * com.xianglei.reserve_service.controller
  * @Description: 客户端订单接口
  */
 @RestController

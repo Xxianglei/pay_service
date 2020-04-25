@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 14:26
- * com.xianglei.charge_service.mapper
+ * com.xianglei.reserve_service.mapper
  * @Description:车位信息service
  */
 @Repository

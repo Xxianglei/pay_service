@@ -4,7 +4,7 @@ package com.xianglei.reserve_service.common;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 14:36
- * com.xianglei.charge_service.common
+ * com.xianglei.reserve_service.common
  * @Description:
  */
 public enum DateEnum {

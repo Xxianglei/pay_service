@@ -8,7 +8,7 @@ import java.util.Date;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 21:46
- * com.xianglei.charge_service.domain
+ * com.xianglei.reserve_service.domain
  * @Description:前端交互 更具停车场查看订单信息
  */
 public class PreOrder {

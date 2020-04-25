@@ -26,7 +26,7 @@ import java.util.List;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 13:56
- * com.xianglei.charge_service.service.impl
+ * com.xianglei.reserve_service.service.impl
  * @Description:
  */
 @Service

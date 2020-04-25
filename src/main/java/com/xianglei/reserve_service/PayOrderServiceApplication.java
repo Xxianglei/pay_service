@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @EnableFeignClients
 @EnableDiscoveryClient
-@MapperScan("com.xianglei.charge_service.mapper")
+@MapperScan("com.xianglei.reserve_service.mapper")
 public class PayOrderServiceApplication {
 
     public static void main(String[] args) {

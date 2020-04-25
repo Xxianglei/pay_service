@@ -20,7 +20,7 @@ import java.util.UUID;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/14 14:20
- * com.xianglei.charge_service.message
+ * com.xianglei.reserve_service.message
  * @Description:订单生成
  */
 @Component

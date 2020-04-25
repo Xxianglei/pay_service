@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 13:47
- * com.xianglei.charge_service.controller
+ * com.xianglei.reserve_service.controller
  * @Description: 订单预约(秒杀)接口
  */
 @RestController

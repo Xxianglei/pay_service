@@ -11,7 +11,7 @@ import java.util.Date;
  * @Auther: Xianglei
  * @Company: xxx
  * @Date: 2020/4/17 20:59
- * com.xianglei.charge_service.domain
+ * com.xianglei.reserve_service.domain
  * @Description:
  */
 @TableName(value ="BS_MESSAGE")
