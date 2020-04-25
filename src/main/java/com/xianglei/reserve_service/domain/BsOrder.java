@@ -8,9 +8,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.util.Date;
 
-@TableName(value ="BS_ORDER")
+@TableName(value = "BS_ORDER")
 public class BsOrder implements Serializable, Cloneable {
-    
+
     @TableId("FLOW_ID")
     private String flowId;
     /**
@@ -56,6 +56,11 @@ public class BsOrder implements Serializable, Cloneable {
      */
     @TableField("CHARGE")
     private String charge;
+    /**
+     *
+     */
+    @TableField("PRICE")
+    private Double price;
 
     /**
      * 车位id
@@ -143,5 +148,11 @@ public class BsOrder implements Serializable, Cloneable {
         this.startTime = startTime;
     }
 
+    public Double getPrice() {
+        return price;
+    }
 
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 }

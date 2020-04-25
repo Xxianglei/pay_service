@@ -93,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
             String location = bsPark.getLocation();
             preBsOrder.setLocation(location);
             // todo 价格计算
-            preBsOrder.setPrice(10.20);
+            preBsOrder.setPrice(bsOrder.getPrice());
             preBsOrder.setFlowId(bsOrder.getFlowId());
             preBsOrder.setUserId(userId);
             preBsOrder.setCarNum(bsOrder.getCarNum());

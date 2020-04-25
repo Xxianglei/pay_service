@@ -23,6 +23,7 @@ public class PreOrder {
     Date endDate;
     String parkName;
     String parkNo;
+    Double price;
 
     public String getName() {
         return name;
@@ -86,5 +87,13 @@ public class PreOrder {
 
     public void setParkNo(String parkNo) {
         this.parkNo = parkNo;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

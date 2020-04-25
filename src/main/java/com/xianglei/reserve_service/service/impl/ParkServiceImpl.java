@@ -53,6 +53,7 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setStartDate(bsOrder.getStartTime());
                 preOrder.setParkNo(bsOrder.getParkInfoId());
                 preOrder.setCarNum(bsOrder.getCarNum());
+                preOrder.setPrice(bsOrder.getPrice());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
                 preOrder.setColor(bsUserCar.getColor());
@@ -75,6 +76,7 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setEndDate(bsOrder.getLeaveTime());
                 preOrder.setParkNo(bsOrder.getParkInfoId());
                 preOrder.setCarNum(bsOrder.getCarNum());
+                preOrder.setPrice(bsOrder.getPrice());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
                 preOrder.setColor(bsUserCar.getColor());
