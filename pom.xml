@@ -105,7 +105,7 @@
     </dependencies>
 
     <build>
-        <finalName>pay_service</finalName>
+        <finalName>reserve_service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

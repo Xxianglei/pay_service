@@ -45,4 +45,4 @@ rocketmq:
   producer:
     group: order-group
 mybatis:
-  type-aliases-package: com.xianglei._service.domain
+  type-aliases-package: com.xianglei.reserve_service.domain
