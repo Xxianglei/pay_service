@@ -50,7 +50,7 @@ public class SubscribeOrderController {
             baseJson.setMessage("锁单成功");
         } else {
             baseJson.setStatus(false);
-            baseJson.setCode(200);
+            baseJson.setCode(500);
             baseJson.setMessage("锁单失败");
         }
         return baseJson;

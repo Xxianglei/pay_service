@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         if (!StringUtils.isEmpty(orderId)) {
             bsOrderQueryWrapper.eq("FLOW_ID", orderId);
         }
-        List<PreBsOrder> list=new ArrayList<>();
+        List<PreBsOrder> list = new ArrayList<>();
         List<BsOrder> bsOrders = orderMapper.selectList(bsOrderQueryWrapper);
         for (BsOrder bsOrder : bsOrders) {
             if ("0".equals(bsOrder.getCharge())) {
@@ -140,11 +140,29 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public int updateParkStatus(String flowId, String userId) {
         BsParkInfo parkInfo = parkInfoMapper.selectById(flowId);
+        String tempOwner = parkInfo.getTempOwner();
         int num = 0;
-        if (Tools.isNotNull(parkInfo)) {
-            parkInfo.setStatus("0");
+        if (StringUtils.isEmpty(tempOwner)) {
+            // 如果车位任何时段都没有人占用 直接更新
             parkInfo.setTempOwner(userId);
-            num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>().ne("STATUS", 0));
+            int index = 3;
+            // 三次自旋
+            while (num != 1 && index > 0) {
+                num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>().eq("TEMP_OWNER", null));
+                index--;
+            }
+        } else {
+            // 如果有人占用则拼接
+            StringBuffer stringBuffer = new StringBuffer(tempOwner);
+            stringBuffer.append("@");
+            stringBuffer.append(userId);
+            parkInfo.setTempOwner(stringBuffer.toString());
+            int index = 3;
+            // 三次自旋
+            while (num != 1 && index > 0) {
+                num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>().eq("TEMP_OWNER", tempOwner));
+                index--;
+            }
         }
         return num;
     }

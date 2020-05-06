@@ -22,6 +22,12 @@ public interface OrderService {
 
     int updateOrder(String flowId);
 
+    /**
+     * 更新停车位信息  锁单
+     * @param flowId
+     * @param userId
+     * @return
+     */
     int updateParkStatus(String flowId, String userId);
 
     int insertOrder(BsOrder bsOrder);
