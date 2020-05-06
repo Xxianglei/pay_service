@@ -40,7 +40,7 @@ public class RedisConsumerCallable implements Callable {
         int insertOrder = orderService.insertOrder(bsOrder);
         // 更新价位
         BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
-        if (priceByOrder.isStatus()) {
+        if (priceByOrder.isStatus()&&priceByOrder.getData()!=null) {
             Double data = (Double) priceByOrder.getData();
             bsOrder.setPrice(data);
             orderService.updateOrder(bsOrder);
