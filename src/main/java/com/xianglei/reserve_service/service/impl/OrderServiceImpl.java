@@ -178,7 +178,6 @@ public class OrderServiceImpl implements OrderService {
         QueryWrapper<BsParkInfo> objectQueryWrapper = new QueryWrapper<>();
         objectQueryWrapper.eq("FLOW_ID", flowId);
         BsParkInfo parkInfo = parkInfoMapper.selectOne(objectQueryWrapper);
-        parkInfo.setStatus("1");
         // 临时拥有者设置为空
         parkInfo.setTempOwner("");
         return parkInfoMapper.updateById(parkInfo);
