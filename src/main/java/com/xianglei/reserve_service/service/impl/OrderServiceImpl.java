@@ -1,6 +1,5 @@
 package com.xianglei.reserve_service.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xianglei.reserve_service.common.DateEnum;
@@ -76,10 +75,9 @@ public class OrderServiceImpl implements OrderService {
             if ("0".equals(bsOrder.getCharge())) {
                 bsOrder.setCharge(OrderStatusEnum.NO_PAY.getName());
                 // 如果订单未支付的时候 从redis拿到订单的剩余存活时间
-                long expire = redisUtil.getExpire(bsOrder.getFlowId());
-                String expireTime = DateUtil.secondToTime(Math.toIntExact(expire));
+      /*          long expire = redisUtil.getExpire(bsOrder.getFlowId());
                 // 设置过期时间
-                preBsOrder.setExpireTime(expireTime);
+                preBsOrder.setExpireTime(expire/1000);*/
             } else if ("1".equals(bsOrder.getCharge())) {
                 bsOrder.setCharge(OrderStatusEnum.PAYED.getName());
             } else {

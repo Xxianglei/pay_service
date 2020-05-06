@@ -55,7 +55,7 @@ public class PreBsOrder implements Serializable, Cloneable {
      */
     private String parkInfoId;
 
-    private String expireTime;
+    private Long expireTime;
 
     public String getFlowId() {
         return flowId;
@@ -161,11 +161,11 @@ public class PreBsOrder implements Serializable, Cloneable {
         this.parkInfoId = parkInfoId;
     }
 
-    public String getExpireTime() {
+    public Long getExpireTime() {
         return expireTime;
     }
 
-    public void setExpireTime(String expireTime) {
+    public void setExpireTime(Long expireTime) {
         this.expireTime = expireTime;
     }
 }
