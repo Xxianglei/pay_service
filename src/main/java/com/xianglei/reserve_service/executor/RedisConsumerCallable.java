@@ -38,6 +38,7 @@ public class RedisConsumerCallable implements Callable {
     @Override
     public Object call() throws Exception {
         int insertOrder = orderService.insertOrder(bsOrder);
+        // 更新价位
         BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
         if (priceByOrder.isStatus()) {
             Double data = (Double) priceByOrder.getData();

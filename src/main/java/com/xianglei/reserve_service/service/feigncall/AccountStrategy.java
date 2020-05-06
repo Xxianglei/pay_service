@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * com.xianglei.reserve_service.service.feigncall
  * @Description:远程调用计费策略
  */
-@FeignClient(value = "account-service")
+@FeignClient(value = "account-service",path = "/api")
 public interface AccountStrategy {
     @GetMapping("/getPrice")
     BaseJson getPriceByOrder(@RequestParam String orderId);

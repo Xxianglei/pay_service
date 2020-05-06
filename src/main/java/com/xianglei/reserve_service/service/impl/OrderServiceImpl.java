@@ -146,6 +146,9 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isNotEmpty(bsOrder.getCarNum())) {
             myOrder.setCarNum(bsOrder.getCarNum());
         }
+        if(bsOrder.getPrice()!=null){
+            myOrder.setPrice(bsOrder.getPrice());
+        }
         int i = orderMapper.updateById(myOrder);
         //更新订单信息
         return i;
