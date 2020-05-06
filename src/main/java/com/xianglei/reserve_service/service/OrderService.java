@@ -4,6 +4,7 @@ import com.xianglei.reserve_service.domain.BsOrder;
 import com.xianglei.reserve_service.domain.PreBsOrder;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Auther: Xianglei
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface OrderService {
 
-    int deleteOrders(List<String> flows);
+    int deleteOrders(List<String> flows,String userId);
 
     List<PreBsOrder>  getMyOrders(String userId, String orderId);
 
@@ -22,15 +23,9 @@ public interface OrderService {
 
     int updateOrder(String flowId);
 
-    /**
-     * 更新停车位信息  锁单
-     * @param flowId
-     * @param userId
-     * @return
-     */
-    int updateParkStatus(String flowId, String userId);
+    int updateParkStatus(Map<String, String> bsOrder);
 
     int insertOrder(BsOrder bsOrder);
 
-    int releaseParkInfo(String flowId);
+    int releaseParkInfo(String flowId, String userId);
 }

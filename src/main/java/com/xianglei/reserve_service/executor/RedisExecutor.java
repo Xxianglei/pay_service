@@ -1,8 +1,13 @@
 package com.xianglei.reserve_service.executor;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.xianglei.reserve_service.common.utils.RedisUtil;
 import com.xianglei.reserve_service.domain.BsOrder;
+import com.xianglei.reserve_service.domain.BsParkInfo;
+import com.xianglei.reserve_service.mapper.OrderMapper;
+import com.xianglei.reserve_service.mapper.ParkInfoMapper;
+import com.xianglei.reserve_service.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,12 @@ public class RedisExecutor {
     RedisUtil redisUtil;
     @Autowired
     RedisConsumerCallable redisConsumerCallable;
+    @Autowired
+    ParkInfoMapper parkInfoMapper;
+    @Autowired
+    OrderService orderService;
+    @Autowired
+    OrderMapper orderMapper;
     private Logger logger = LoggerFactory.getLogger(RedisExecutor.class);
     private int maxThreadNum = 0;
     // 只实例化了一次 单例
@@ -49,9 +60,17 @@ public class RedisExecutor {
         try {
             result = submit.get();
         } catch (InterruptedException e) {
+            // 回滚
+            BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+            orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
+            orderMapper.deleteById(order.getFlowId());
             e.printStackTrace();
             logger.error("线程池中断异常{}", e);
         } catch (ExecutionException e) {
+            // 回滚
+            BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+            orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
+            orderMapper.deleteById(order.getFlowId());
             e.printStackTrace();
             logger.error("线程池执行任务失败{}", e);
         }

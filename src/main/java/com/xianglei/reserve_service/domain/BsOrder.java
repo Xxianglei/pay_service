@@ -21,19 +21,19 @@ public class BsOrder implements Serializable, Cloneable {
     /**
      * 订单创建时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "HH:mm:ss")
     @TableField("CREATE_TIME")
     private Date createTime;
     /**
      * 开始时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "HH:mm:ss")
     @TableField("START_TIME")
     private Date startTime;
     /**
      * 离开时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "HH:mm:ss")
     @TableField("LEAVE_TIME")
     private Date leaveTime;
     /**

@@ -102,6 +102,17 @@
             <artifactId>rocketmq-client</artifactId>
             <version>3.5.8</version>
         </dependency>
+        <!-- 糊涂转换工具类  项目中主要用来转换时间-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.3.2</version>
+        </dependency>
+        <!--feign 集成sentinel 做熔断器-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

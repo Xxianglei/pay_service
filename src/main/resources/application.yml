@@ -1,6 +1,9 @@
 server:
   port: 9003
-
+# 开启熔断器
+feign:
+  sentinel:
+    enabled: true
 #服务的名称
 spring:
   application:
@@ -43,6 +46,6 @@ logging:
 rocketmq:
   name-server: 120.26.184.125:9876
   producer:
-    group: order-group
+    group: producer_group
 mybatis:
   type-aliases-package: com.xianglei.reserve_service.domain

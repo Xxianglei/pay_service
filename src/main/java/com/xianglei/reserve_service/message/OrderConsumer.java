@@ -1,10 +1,14 @@
 package com.xianglei.reserve_service.message;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.xianglei.reserve_service.common.utils.RedisUtil;
 import com.xianglei.reserve_service.common.utils.Tools;
 import com.xianglei.reserve_service.domain.BsMessage;
 import com.xianglei.reserve_service.domain.BsOrder;
+import com.xianglei.reserve_service.domain.BsParkInfo;
 import com.xianglei.reserve_service.executor.RedisExecutor;
+import com.xianglei.reserve_service.mapper.ParkInfoMapper;
 import com.xianglei.reserve_service.service.MessageService;
 import com.xianglei.reserve_service.service.OrderService;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
@@ -37,13 +41,17 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
     MessageService messageService;
     @Autowired
     OrderService orderService;
+    @Autowired
+    ParkInfoMapper parkInfoMapper;
+    @Autowired
+    RedisUtil redisUtil;
     private Logger logger = LoggerFactory.getLogger(OrderConsumer.class);
 
     @Override
     public void onMessage(BsOrder s) {
+        BsOrder order = s;
         try {
             logger.info("消费端消费任务插入数据库");
-            BsOrder order = s;
             BsMessage bsMessage = new BsMessage();
             /**
              * 消费幂等处理
@@ -53,7 +61,9 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
                 if (Tools.isNull(messageById)) {
                     // 任务出队 执行失败直接丢弃任务更新状态
                     int consume = redisExecutor.consume(order);
-                    if (consume != 0) {
+                    // 如果消费成功  则放入redis 设置过期时间  k为订单id  半小时订单过期
+                    boolean setOk = redisUtil.set(order.getFlowId(), order.getFlowId(), 1000 * 60 * 30);
+                    if (consume != 0 && setOk) {
                         bsMessage.setFlowId(UUID.randomUUID().toString());
                         bsMessage.setTxId(order.getFlowId());
                         messageService.insertMessage(bsMessage);
@@ -62,14 +72,16 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
                         /**
                          * 车位释放
                          */
-                        orderService.releaseParkInfo(order.getFlowId());
+                        BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+                        orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
                         logger.error("消费端消费任务提交线程池失败");
                     }
-
                 }
             }
 
         } catch (Exception e) {
+            BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+            orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
             logger.error("消息队列任务出队失败：{}", e);
         }
 
@@ -82,7 +94,7 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
      */
     @Override
     public void prepareStart(DefaultMQPushConsumer defaultMQPushConsumer) {
-        defaultMQPushConsumer.setMaxReconsumeTimes(3);
+        defaultMQPushConsumer.setMaxReconsumeTimes(1);
     }
 
 }

@@ -9,7 +9,7 @@ package com.xianglei.reserve_service.common;
  */
 public enum MessageTopic {
 
-    ORDER("ORDER-TOPIC"),
+    ORDER("ORDER_TOPIC"),
     KEY("ORDER");
     private final String name;
 

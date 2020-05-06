@@ -68,10 +68,10 @@ public class ClientsOrderController {
      * @return
      */
     @RequestMapping("/deleteOrder")
-    public BaseJson DeleteOrder(@RequestParam List<String> flowIds) {
+    public BaseJson DeleteOrder(@RequestParam List<String> flowIds, @RequestParam String userId) {
         BaseJson baseJson = new BaseJson(false);
         try {
-            int nums = orderService.deleteOrders(flowIds);
+            int nums = orderService.deleteOrders(flowIds,userId);
             baseJson.setMessage("删除成功");
             baseJson.setCode(200);
             baseJson.setData(nums);

@@ -31,20 +31,4 @@ public class PayController {
         BaseJson baseJson = new BaseJson();
         return baseJson;
     }
-
-    @RequestMapping("/update")
-    public BaseJson updateOrder(@RequestParam String flowId) {
-        BaseJson baseJson = new BaseJson();
-        int result = orderService.updateOrder(flowId);
-        if (result != 0) {
-            baseJson.setMessage("订单状态修改成功");
-            baseJson.setStatus(true);
-            baseJson.setCode(200);
-        } else {
-            baseJson.setMessage("订单状态修改失败");
-            baseJson.setStatus(false);
-            baseJson.setCode(500);
-        }
-        return baseJson;
-    }
 }
