@@ -51,11 +51,16 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public int deleteOrders(List<String> flowIds, String userId) {
+        // 不可批量删除
+        BsOrder bsOrder = orderMapper.selectById(flowIds.get(0));
         int nums = orderMapper.deleteBatchIds(flowIds);
-        // 找到对应车位，释放车位
-        for (String flowId : flowIds) {
-            releaseParkInfo(flowId, userId);
-        }
+        // 找到对应车位，释放车位  这个flowId是订单id
+        String parkInfoId = bsOrder.getParkInfoId();
+        String parkId = bsOrder.getParkId();
+        BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>()
+                .eq("PARK_NUM", parkInfoId)
+                .eq("PARK_ID", parkId));
+        releaseParkInfo(bsParkInfo.getFlowId(), userId);
         return nums;
     }
 
@@ -144,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isNotEmpty(bsOrder.getCarNum())) {
             myOrder.setCarNum(bsOrder.getCarNum());
         }
-        if(bsOrder.getPrice()!=null){
+        if (bsOrder.getPrice() != null) {
             myOrder.setPrice(bsOrder.getPrice());
         }
         int i = orderMapper.updateById(myOrder);
@@ -172,17 +177,17 @@ public class OrderServiceImpl implements OrderService {
         String startTime = bsOrderMap.get("startTime");
         // 获取当前日期  拼接时间  转换为Date存入数据库
         String now = DateUtils.getNow("yyyy-MM-dd");
-        startTime=now+" "+startTime+":00";
-        leaveTime=now+" "+leaveTime+":00";
-        bsOrder.setLeaveTime(DateUtils.parse(leaveTime,"yyyy-MM-dd HH:mm:ss"));
-        bsOrder.setStartTime(DateUtils.parse(startTime,"yyyy-MM-dd HH:mm:ss"));
+        startTime = now + " " + startTime + ":00";
+        leaveTime = now + " " + leaveTime + ":00";
+        bsOrder.setLeaveTime(DateUtils.parse(leaveTime, "yyyy-MM-dd HH:mm:ss"));
+        bsOrder.setStartTime(DateUtils.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
         bsOrder.setParkId(bsOrderMap.get("parkId"));
         bsOrder.setUserId(bsOrderMap.get("userId"));
         bsOrder.setParkInfoId(bsOrderMap.get("parkInfoId"));
         bsOrder.setFlowId(UUID.randomUUID().toString());
-        if(leaveTime.compareTo("18:00")<=0&&startTime.compareTo("06:00")>=0){
+        if (leaveTime.compareTo("18:00") <= 0 && startTime.compareTo("06:00") >= 0) {
             bsOrder.setEvening("0");
-        }else{
+        } else {
             bsOrder.setEvening("1");
         }
         String parkId = bsOrder.getParkId();
@@ -204,39 +209,34 @@ public class OrderServiceImpl implements OrderService {
                         break;
                     } else {
                         num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                                .eq("TEMP_OWNER", tempOwner)
-                                .eq("PARK_ID",parkInfo.getParkId())
-                                .eq("PARK_NUM",parkInfoId));
+                                .eq("TEMP_OWNER", tempOwner + "@")
+                                .eq("PARK_ID", parkInfo.getParkId())
+                                .eq("PARK_NUM", parkInfoId));
                         index--;
                     }
                 }
             }
         } else {
-            // 如果已经锁单  避免重复锁单
-            if (tempOwner.contains(userId)) {
-                num = num;
-            } else {
-                // 先发消息  大不了校验一次
-                SendResult sendResult = orderProducer.sendOrder(bsOrder);
-                SendStatus sendStatus = sendResult.getSendStatus();
-                if (sendStatus.ordinal() == 0) {
-                    // 如果有人占用则拼接
-                    StringBuffer stringBuffer = new StringBuffer(tempOwner);
-                    stringBuffer.append("@");
-                    stringBuffer.append(userId);
-                    parkInfo.setTempOwner(stringBuffer.toString());
-                    int index = 3;
-                    // 三次自旋
-                    while (index > 0) {
-                        if (num != 0) {
-                            break;
-                        } else {
-                            num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                                    .eq("TEMP_OWNER", tempOwner)
-                                    .eq("PARK_ID",parkInfo.getParkId())
-                                    .eq("PARK_NUM",parkInfoId));
-                            index--;
-                        }
+            // 先发消息  大不了校验一次
+            SendResult sendResult = orderProducer.sendOrder(bsOrder);
+            SendStatus sendStatus = sendResult.getSendStatus();
+            if (sendStatus.ordinal() == 0) {
+                // 如果有人占用则拼接
+                StringBuffer stringBuffer = new StringBuffer(tempOwner);
+                stringBuffer.append(userId);
+                stringBuffer.append("@");
+                parkInfo.setTempOwner(stringBuffer.toString());
+                int index = 3;
+                // 三次自旋
+                while (index > 0) {
+                    if (num != 0) {
+                        break;
+                    } else {
+                        num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
+                                .eq("TEMP_OWNER", tempOwner)
+                                .eq("PARK_ID", parkInfo.getParkId())
+                                .eq("PARK_NUM", parkInfoId));
+                        index--;
                     }
                 }
             }
@@ -259,7 +259,7 @@ public class OrderServiceImpl implements OrderService {
         BsParkInfo parkInfo = parkInfoMapper.selectOne(objectQueryWrapper);
         // 当前临时拥有者设置为空
         String tempOwner = parkInfo.getTempOwner();
-        String replace = tempOwner.replace(userId, "");
+        String replace = tempOwner.replace(userId + "@", "");
         parkInfo.setTempOwner(replace);
         return parkInfoMapper.updateById(parkInfo);
     }
