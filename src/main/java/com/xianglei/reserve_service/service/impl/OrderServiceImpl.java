@@ -259,8 +259,10 @@ public class OrderServiceImpl implements OrderService {
         BsParkInfo parkInfo = parkInfoMapper.selectOne(objectQueryWrapper);
         // 当前临时拥有者设置为空
         String tempOwner = parkInfo.getTempOwner();
-        String replace = tempOwner.replace(userId + "@", "");
-        parkInfo.setTempOwner(replace);
+        if(StringUtils.isNotEmpty(tempOwner)){
+            String replace = tempOwner.replace(userId + "@", "");
+            parkInfo.setTempOwner(replace);
+        }
         return parkInfoMapper.updateById(parkInfo);
     }
 
