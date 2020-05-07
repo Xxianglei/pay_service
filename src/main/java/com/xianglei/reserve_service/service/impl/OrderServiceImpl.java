@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
             SendStatus sendStatus = sendResult.getSendStatus();
             if (sendStatus.ordinal() == 0) {
                 // 如果车位任何时段都没有人占用 直接更新
-                parkInfo.setTempOwner(userId);
+                parkInfo.setTempOwner(userId+ "@");
                 int index = 3;
                 // 三次自旋
                 while (index > 0) {
@@ -209,7 +209,7 @@ public class OrderServiceImpl implements OrderService {
                         break;
                     } else {
                         num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                                .eq("TEMP_OWNER", tempOwner + "@")
+                                .eq("TEMP_OWNER", tempOwner )
                                 .eq("PARK_ID", parkInfo.getParkId())
                                 .eq("PARK_NUM", parkInfoId));
                         index--;
