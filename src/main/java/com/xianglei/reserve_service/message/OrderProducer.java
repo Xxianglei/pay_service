@@ -44,13 +44,15 @@ public class OrderProducer {
         /*前端需要传入 除了parkinfoid charge   FLOW_ID*/
         SendResult sendResult = null;
         String userId = bsOrder.getUserId();
-        BsParkInfo parkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().like("TEMP_OWNER", userId).eq("PARK_ID",bsOrder.getParkId()).eq("PARK_NUM",bsOrder.getParkInfoId()));
-        if (Tools.isNull(parkInfo)) {
+        BsParkInfo parkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().like("TEMP_OWNER", userId).eq("PARK_ID", bsOrder.getParkId()).eq("PARK_NUM", bsOrder.getParkInfoId()));
+        // 车位占用成功 后续根据这个按序生成订单
+        if (Tools.isNotNull(parkInfo)) {
+            // 设置订单编号
             bsOrder.setFlowId(UUID.randomUUID().toString());
             // 发送到消息队列(消费端插入数据库)  消费端处理支付信息
             sendResult = rocketMQTemplate.syncSend(MessageTopic.ORDER.getName(), bsOrder);
         } else {
-            // 车位被其他用户抢占了或者重复占用
+            // 车位占用失败
             sendResult.setSendStatus(SendStatus.SLAVE_NOT_AVAILABLE);
         }
         return sendResult;

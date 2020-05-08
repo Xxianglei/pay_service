@@ -168,6 +168,12 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.updateById(myOrder);
     }
 
+    /**
+     * 乐观锁解决并发问题
+     *
+     * @param bsOrderMap
+     * @return
+     */
     @Transactional
     @Override
     public int updateParkStatus(Map<String, String> bsOrderMap) {
@@ -197,47 +203,53 @@ public class OrderServiceImpl implements OrderService {
         String tempOwner = parkInfo.getTempOwner();
         int num = 0;
         if (StringUtils.isEmpty(tempOwner)) {
-            SendResult sendResult = orderProducer.sendOrder(bsOrder);
-            SendStatus sendStatus = sendResult.getSendStatus();
-            if (sendStatus.ordinal() == 0) {
-                // 如果车位任何时段都没有人占用 直接更新
-                parkInfo.setTempOwner(userId+ "@");
-                int index = 3;
-                // 三次自旋
-                while (index > 0) {
-                    if (num != 0) {
-                        break;
-                    } else {
-                        num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                                .eq("TEMP_OWNER", tempOwner )
-                                .eq("PARK_ID", parkInfo.getParkId())
-                                .eq("PARK_NUM", parkInfoId));
-                        index--;
-                    }
+            // 如果车位任何时段都没有人占用 直接更新
+            parkInfo.setTempOwner(userId + "@");
+            int index = 3;
+            // 三次自旋
+            while (index > 0) {
+                if (num != 0) {
+                    break;
+                } else {
+                    num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
+                            .eq("TEMP_OWNER", tempOwner)
+                            .eq("PARK_ID", parkInfo.getParkId())
+                            .eq("PARK_NUM", parkInfoId));
+                    index--;
+                }
+            }
+            if (num != 0) {
+                SendResult sendResult = orderProducer.sendOrder(bsOrder);
+                SendStatus sendStatus = sendResult.getSendStatus();
+                if (sendStatus.ordinal() != 0) {
+                    throw new RuntimeException("消息发送失败");
                 }
             }
         } else {
-            // 先发消息  大不了校验一次
-            SendResult sendResult = orderProducer.sendOrder(bsOrder);
-            SendStatus sendStatus = sendResult.getSendStatus();
-            if (sendStatus.ordinal() == 0) {
-                // 如果有人占用则拼接
-                StringBuffer stringBuffer = new StringBuffer(tempOwner);
-                stringBuffer.append(userId);
-                stringBuffer.append("@");
-                parkInfo.setTempOwner(stringBuffer.toString());
-                int index = 3;
-                // 三次自旋
-                while (index > 0) {
-                    if (num != 0) {
-                        break;
-                    } else {
-                        num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                                .eq("TEMP_OWNER", tempOwner)
-                                .eq("PARK_ID", parkInfo.getParkId())
-                                .eq("PARK_NUM", parkInfoId));
-                        index--;
-                    }
+            // 如果有人占用则拼接
+            StringBuffer stringBuffer = new StringBuffer(tempOwner);
+            stringBuffer.append(userId);
+            stringBuffer.append("@");
+            parkInfo.setTempOwner(stringBuffer.toString());
+            int index = 3;
+            // 三次自旋
+            while (index > 0) {
+                if (num != 0) {
+                    break;
+                } else {
+                    num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
+                            .eq("TEMP_OWNER", tempOwner)
+                            .eq("PARK_ID", parkInfo.getParkId())
+                            .eq("PARK_NUM", parkInfoId));
+                    index--;
+                }
+            }
+            // 后发消息
+            if (num != 0) {
+                SendResult sendResult = orderProducer.sendOrder(bsOrder);
+                SendStatus sendStatus = sendResult.getSendStatus();
+                if (sendStatus.ordinal() != 0) {
+                    throw new RuntimeException("消息发送失败");
                 }
             }
 
@@ -259,7 +271,7 @@ public class OrderServiceImpl implements OrderService {
         BsParkInfo parkInfo = parkInfoMapper.selectOne(objectQueryWrapper);
         // 当前临时拥有者设置为空
         String tempOwner = parkInfo.getTempOwner();
-        if(StringUtils.isNotEmpty(tempOwner)){
+        if (StringUtils.isNotEmpty(tempOwner)) {
             String replace = tempOwner.replace(userId + "@", "");
             parkInfo.setTempOwner(replace);
         }

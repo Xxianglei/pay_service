@@ -58,21 +58,22 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
              */
             if (Tools.isNotNull(order)) {
                 BsMessage messageById = messageService.getMessageById(order.getFlowId());
+                // 未被消费
                 if (Tools.isNull(messageById)) {
                     // 任务出队 执行失败直接丢弃任务更新状态
                     int consume = redisExecutor.consume(order);
-                    // 如果消费成功  则放入redis 设置过期时间  k为订单id  半小时订单过期
-                    boolean setOk = redisUtil.set(order.getFlowId(), order.getFlowId(), 1000 * 60 * 30);
-                    if (consume != 0 && setOk) {
+                    if (consume != 0) {
                         bsMessage.setFlowId(UUID.randomUUID().toString());
                         bsMessage.setTxId(order.getFlowId());
                         messageService.insertMessage(bsMessage);
                         logger.info("消费端消费任务提交线程池成功");
+                        BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM", order.getParkInfoId()).eq("PARK_ID", order.getParkId()));
+                        orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
                     } else {
                         /**
                          * 车位释放
                          */
-                        BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+                        BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM", order.getParkInfoId()).eq("PARK_ID", order.getParkId()));
                         orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
                         logger.error("消费端消费任务提交线程池失败");
                     }
@@ -80,7 +81,7 @@ public class OrderConsumer implements RocketMQListener<BsOrder>, RocketMQPushCon
             }
 
         } catch (Exception e) {
-            BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
+            BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM", order.getParkInfoId()).eq("PARK_ID", order.getParkId()));
             orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
             logger.error("消息队列任务出队失败：{}", e);
         }
