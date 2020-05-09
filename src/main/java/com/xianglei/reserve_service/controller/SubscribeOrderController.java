@@ -40,7 +40,7 @@ public class SubscribeOrderController {
      * @return
      */
     @RequestMapping("/lockOrder")
-    public BaseJson PlaceOrder(@RequestBody Map<String,String> bsOrderMap) {
+    public BaseJson PlaceOrder(@RequestBody Map<String, String> bsOrderMap) {
         BaseJson baseJson = new BaseJson();
         if (Tools.isNull(bsOrderMap)) {
             baseJson.setMessage("参数错误");

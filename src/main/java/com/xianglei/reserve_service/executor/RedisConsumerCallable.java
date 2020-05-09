@@ -12,6 +12,7 @@ import com.xianglei.reserve_service.service.feigncall.AccountStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -38,6 +39,9 @@ public class RedisConsumerCallable implements Callable {
     @Autowired
     ParkInfoMapper parkInfoMapper;
     BsOrder bsOrder;
+    @Autowired
+    RedisTemplate redisTemplate;
+    public static final String ORDER_QUEUE_KEY = "orderQueue";
 
     public void setOrder(BsOrder bsOrder) {
         this.bsOrder = bsOrder;
@@ -47,20 +51,22 @@ public class RedisConsumerCallable implements Callable {
     public Object call() throws Exception {
         synchronized (RedisConsumerCallable.class) {
             int insertOrder = 0;
+            String userId = (String) redisTemplate.opsForList().leftPop(ORDER_QUEUE_KEY);
             // 获取userID判断是否是数组第一个如果是则开始下单，如果不是则判断是否已经已经被其他用户占用了当前时间段，如果没有则新增订单
             BsParkInfo parkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_ID", bsOrder.getParkId()).eq("PARK_NUM", bsOrder.getParkInfoId()));
             // 不可能是空
             String tempOwner = parkInfo.getTempOwner();
             int index = tempOwner.indexOf(bsOrder.getUserId());
             // 如果能成功必定是第0个
-            if (index != 0) {
+            // 如果不是第0个或者没有在redis队头 则判断是否时间被抢占
+            if (index != 0||!tempOwner.equals(userId)) {
                 // 判断是否其他用户占用同时间段(大包小)
                 Date startTime = bsOrder.getStartTime();
                 Date leaveTime = bsOrder.getLeaveTime();
                 List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
                         .ge("START_TIME", startTime).le("LEAVE_TIME", leaveTime)
                         .eq("PARK_ID", bsOrder.getParkId())
-                        .eq("PARK_NUM", bsOrder.getParkInfoId()));
+                        .eq("PARK_INFO_ID", bsOrder.getParkInfoId()));
                 if (Tools.isNotEmpty(bsOrders)) {
                     insertOrder = 0;
                 } else {
