@@ -42,4 +42,24 @@ public class BackOrderController {
         baseJson.setMessage("查询成功");
         return baseJson;
     }
+    /**
+     * 管理员查看所有订单
+     *
+     * @param flowId
+     * @param
+     * @return
+     */
+    @RequestMapping("/deleteOrder")
+    public BaseJson deleteOrder(@RequestParam("flowId") String flowId) {
+        BaseJson baseJson = new BaseJson(true);
+        int res = parkService.deleteOrder(flowId);
+        if(res!=0){
+            baseJson.setCode(200);
+            baseJson.setMessage("查询成功");
+        }else{
+
+        }    baseJson.setCode(500);
+        baseJson.setMessage("查询失败");
+        return baseJson;
+    }
 }

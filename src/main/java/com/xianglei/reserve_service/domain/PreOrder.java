@@ -12,6 +12,7 @@ import java.util.Date;
  * @Description:前端交互 更具停车场查看订单信息
  */
 public class PreOrder {
+    String flowId;
     String name;
     String carNum;
     String color;
@@ -25,6 +26,14 @@ public class PreOrder {
     String parkNo;
     Double price;
     String charge;
+
+    public String getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(String flowId) {
+        this.flowId = flowId;
+    }
 
     public String getCharge() {
         return charge;

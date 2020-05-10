@@ -55,6 +55,7 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setCarNum(bsOrder.getCarNum());
                 preOrder.setPrice(bsOrder.getPrice());
                 preOrder.setCharge(bsOrder.getCharge());
+                preOrder.setFlowId(bsOrder.getFlowId());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
                 preOrder.setColor(bsUserCar.getColor());
@@ -79,6 +80,7 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setCarNum(bsOrder.getCarNum());
                 preOrder.setPrice(bsOrder.getPrice());
                 preOrder.setCharge(bsOrder.getCharge());
+                preOrder.setFlowId(bsOrder.getFlowId());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
                 preOrder.setColor(bsUserCar.getColor());
@@ -95,5 +97,11 @@ public class ParkServiceImpl implements ParkService {
             }
         });
         return preOrders;
+    }
+
+    @Override
+    public int deleteOrder(String flowId) {
+        int i = orderMapper.deleteById(flowId);
+        return i;
     }
 }

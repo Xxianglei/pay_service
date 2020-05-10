@@ -14,4 +14,11 @@ import java.util.List;
 public interface ParkService {
 
     List<PreOrder> getPark(String name);
+
+    /**
+     * 根据ID删除订单
+     * @param flowId
+     * @return
+     */
+    int deleteOrder(String flowId);
 }
