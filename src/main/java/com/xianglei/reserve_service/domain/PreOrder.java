@@ -24,6 +24,15 @@ public class PreOrder {
     String parkName;
     String parkNo;
     Double price;
+    String charge;
+
+    public String getCharge() {
+        return charge;
+    }
+
+    public void setCharge(String charge) {
+        this.charge = charge;
+    }
 
     public String getName() {
         return name;
