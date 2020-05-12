@@ -179,9 +179,8 @@ public class OrderServiceImpl implements OrderService {
         String leaveTime = bsOrderMap.get("leaveTime");
         String startTime = bsOrderMap.get("startTime");
         // 获取当前日期  拼接时间  转换为Date存入数据库
-        String now = DateUtils.getNow("yyyy-MM-dd");
-        startTime = now + " " + startTime + ":00";
-        leaveTime = now + " " + leaveTime + ":00";
+        startTime = startTime + ":00";
+        leaveTime = leaveTime + ":00";
         bsOrder.setLeaveTime(DateUtils.parse(leaveTime, "yyyy-MM-dd HH:mm:ss"));
         bsOrder.setStartTime(DateUtils.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
         bsOrder.setParkId(bsOrderMap.get("parkId"));
@@ -278,9 +277,8 @@ public class OrderServiceImpl implements OrderService {
     public int checkOrderIsOk(Map<String, String> bsOrder) {
         String startTime = bsOrder.get("startTime");
         String leaveTime = bsOrder.get("leaveTime");
-        String now = DateUtils.getNow("yyyy-MM-dd");
-        startTime = now + " " + startTime + ":00";
-        leaveTime = now + " " + leaveTime + ":00";
+        startTime =  startTime + ":00";
+        leaveTime =  leaveTime + ":00";
         List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
                 .eq("USER_ID", bsOrder.get("userId"))
                 .eq("PARK_INFO_ID", bsOrder.get("parkInfoId"))
