@@ -72,12 +72,19 @@ public class ClientsOrderController {
         BaseJson baseJson = new BaseJson(false);
         try {
             int nums = orderService.deleteOrders(flowIds, userId);
-            baseJson.setMessage("删除成功");
-            baseJson.setCode(200);
-            baseJson.setData(nums);
-            baseJson.setStatus(true);
+            if (nums != 0) {
+                baseJson.setMessage("删除成功");
+                baseJson.setCode(200);
+                baseJson.setStatus(true);
+            } else {
+                baseJson.setMessage("删除失败");
+                baseJson.setCode(200);
+                baseJson.setStatus(true);
+            }
+
         } catch (Exception e) {
-            baseJson.setMessage("删除出错");
+            baseJson.setCode(500);
+            baseJson.setMessage("删除异常");
         }
         return baseJson;
     }
