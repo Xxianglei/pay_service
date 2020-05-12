@@ -40,31 +40,33 @@ public class ParkServiceImpl implements ParkService {
         if (StringUtils.isNotEmpty(name)) {
             //查询特有的订单 按创建时间倒叙
             BsPark bsPark = parkMapper.selectOne(new QueryWrapper<BsPark>().eq("PARK_NAME", name));
-            // 停车场id
-            String flowId = bsPark.getFlowId();
-            // 查到当前停车场的所有订单
-            List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>().eq("PARK_ID", flowId));
-            for (BsOrder bsOrder : bsOrders) {
-                PreOrder preOrder = new PreOrder();
-                preOrder.setParkName(name);
-                BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
-                if (Tools.isNotNull(bsUser)) {
-                    preOrder.setName(bsUser.getName());
+            if(Tools.isNotNull(bsPark)){
+                // 停车场id
+                String flowId = bsPark.getFlowId();
+                // 查到当前停车场的所有订单
+                List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>().eq("PARK_ID", flowId));
+                for (BsOrder bsOrder : bsOrders) {
+                    PreOrder preOrder = new PreOrder();
+                    preOrder.setParkName(name);
+                    BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
+                    if (Tools.isNotNull(bsUser)) {
+                        preOrder.setName(bsUser.getName());
+                    }
+                    preOrder.setCreateDate(bsOrder.getCreateTime());
+                    preOrder.setEndDate(bsOrder.getLeaveTime());
+                    preOrder.setStartDate(bsOrder.getStartTime());
+                    preOrder.setParkNo(bsOrder.getParkInfoId());
+                    preOrder.setCarNum(bsOrder.getCarNum());
+                    preOrder.setPrice(bsOrder.getPrice());
+                    preOrder.setCharge(bsOrder.getCharge());
+                    preOrder.setFlowId(bsOrder.getFlowId());
+                    // 获取车辆色号
+                    BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
+                    if (Tools.isNotNull(bsUserCar)) {
+                        preOrder.setColor(bsUserCar.getColor());
+                    }
+                    preOrders.add(preOrder);
                 }
-                preOrder.setCreateDate(bsOrder.getCreateTime());
-                preOrder.setEndDate(bsOrder.getLeaveTime());
-                preOrder.setStartDate(bsOrder.getStartTime());
-                preOrder.setParkNo(bsOrder.getParkInfoId());
-                preOrder.setCarNum(bsOrder.getCarNum());
-                preOrder.setPrice(bsOrder.getPrice());
-                preOrder.setCharge(bsOrder.getCharge());
-                preOrder.setFlowId(bsOrder.getFlowId());
-                // 获取车辆色号
-                BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
-                if (Tools.isNotNull(bsUserCar)) {
-                    preOrder.setColor(bsUserCar.getColor());
-                }
-                preOrders.add(preOrder);
             }
         } else {
             //查询所有的订单 按创建时间倒叙
