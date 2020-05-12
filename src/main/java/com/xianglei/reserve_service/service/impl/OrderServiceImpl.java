@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
         BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>()
                 .eq("PARK_NUM", parkInfoId)
                 .eq("PARK_ID", parkId));
-        if(Tools.isNull(bsParkInfo)){
+        if(Tools.isNotNull(bsParkInfo)){
             releaseParkInfo(bsParkInfo.getFlowId(), userId);
         }
         return nums;
