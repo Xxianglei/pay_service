@@ -1,6 +1,7 @@
 package com.xianglei.reserve_service.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.xianglei.reserve_service.common.utils.Tools;
 import com.xianglei.reserve_service.domain.*;
 import com.xianglei.reserve_service.mapper.CarMapper;
 import com.xianglei.reserve_service.mapper.OrderMapper;
@@ -47,7 +48,9 @@ public class ParkServiceImpl implements ParkService {
                 PreOrder preOrder = new PreOrder();
                 preOrder.setParkName(name);
                 BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
-                preOrder.setName(bsUser.getName());
+                if (Tools.isNotNull(bsUser)) {
+                    preOrder.setName(bsUser.getName());
+                }
                 preOrder.setCreateDate(bsOrder.getCreateTime());
                 preOrder.setEndDate(bsOrder.getLeaveTime());
                 preOrder.setStartDate(bsOrder.getStartTime());
@@ -58,7 +61,9 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setFlowId(bsOrder.getFlowId());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
-                preOrder.setColor(bsUserCar.getColor());
+                if (Tools.isNotNull(bsUserCar)) {
+                    preOrder.setColor(bsUserCar.getColor());
+                }
                 preOrders.add(preOrder);
             }
         } else {
@@ -72,7 +77,9 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setParkName(bsPark.getParkName());
                 // 下单人名字
                 BsUser bsUser = userMapper.selectOne(new QueryWrapper<BsUser>().eq("FLOW_ID", bsOrder.getUserId()));
-                preOrder.setName(bsUser.getName());
+                if (Tools.isNotNull(bsUser)) {
+                    preOrder.setName(bsUser.getName());
+                }
                 preOrder.setCreateDate(bsOrder.getCreateTime());
                 preOrder.setStartDate(bsOrder.getStartTime());
                 preOrder.setEndDate(bsOrder.getLeaveTime());
@@ -83,7 +90,9 @@ public class ParkServiceImpl implements ParkService {
                 preOrder.setFlowId(bsOrder.getFlowId());
                 // 获取车辆色号
                 BsUserCar bsUserCar = carMapper.selectOne(new QueryWrapper<BsUserCar>().eq("USER_ID", bsOrder.getUserId()).eq("CAR_NUM", bsOrder.getCarNum()));
-                preOrder.setColor(bsUserCar.getColor());
+                if (Tools.isNotNull(bsUserCar)) {
+                    preOrder.setColor(bsUserCar.getColor());
+                }
                 preOrders.add(preOrder);
             }
         }
