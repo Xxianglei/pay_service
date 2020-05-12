@@ -59,14 +59,15 @@ public class RedisConsumerCallable implements Callable {
             int index = tempOwner.indexOf(bsOrder.getUserId());
             // 如果能成功必定是第0个
             // 如果不是第0个或者没有在redis队头 则判断是否时间被抢占
-            if (index != 0&&!tempOwner.contains(userId)) {
+            if (index != 0 && !tempOwner.contains(userId)) {
                 // 判断是否其他用户占用同时间段(大包小)
                 Date startTime = bsOrder.getStartTime();
                 Date leaveTime = bsOrder.getLeaveTime();
                 List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
                         .ge("START_TIME", startTime).le("LEAVE_TIME", leaveTime)
                         .eq("PARK_ID", bsOrder.getParkId())
-                        .eq("PARK_INFO_ID", bsOrder.getParkInfoId()));
+                        .eq("PARK_INFO_ID", bsOrder.getParkInfoId())
+                        .ne("CHARGE", 2));
                 if (Tools.isNotEmpty(bsOrders)) {
                     insertOrder = 0;
                 } else {
