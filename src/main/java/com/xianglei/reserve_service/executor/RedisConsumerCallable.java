@@ -59,7 +59,7 @@ public class RedisConsumerCallable implements Callable {
             int index = tempOwner.indexOf(bsOrder.getUserId());
             // 如果能成功必定是第0个
             // 如果不是第0个或者没有在redis队头 则判断是否时间被抢占
-            if (index != 0||!tempOwner.equals(userId)) {
+            if (index != 0&&!tempOwner.contains(userId)) {
                 // 判断是否其他用户占用同时间段(大包小)
                 Date startTime = bsOrder.getStartTime();
                 Date leaveTime = bsOrder.getLeaveTime();

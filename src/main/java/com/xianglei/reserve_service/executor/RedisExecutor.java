@@ -2,7 +2,6 @@ package com.xianglei.reserve_service.executor;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.xianglei.reserve_service.common.utils.RedisUtil;
 import com.xianglei.reserve_service.domain.BsOrder;
 import com.xianglei.reserve_service.domain.BsParkInfo;
 import com.xianglei.reserve_service.mapper.OrderMapper;
@@ -11,6 +10,7 @@ import com.xianglei.reserve_service.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.*;
@@ -21,7 +21,7 @@ import java.util.concurrent.*;
 @Component
 public class RedisExecutor {
     @Autowired
-    RedisUtil redisUtil;
+    RedisTemplate redisTemplate;
     @Autowired
     RedisConsumerCallable redisConsumerCallable;
     @Autowired
@@ -31,6 +31,7 @@ public class RedisExecutor {
     @Autowired
     OrderMapper orderMapper;
     private Logger logger = LoggerFactory.getLogger(RedisExecutor.class);
+    public static final String ORDER_QUEUE_KEY = "orderQueue";
     private int maxThreadNum = 0;
     // 只实例化了一次 单例
     private ExecutorService pool;
@@ -60,6 +61,7 @@ public class RedisExecutor {
         try {
             result = submit.get();
         } catch (InterruptedException e) {
+            String userId = (String) redisTemplate.opsForList().leftPop(ORDER_QUEUE_KEY);
             // 回滚
             BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
             orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());
@@ -67,6 +69,7 @@ public class RedisExecutor {
             e.printStackTrace();
             logger.error("线程池中断异常{}", e);
         } catch (ExecutionException e) {
+            String userId = (String) redisTemplate.opsForList().leftPop(ORDER_QUEUE_KEY);
             // 回滚
             BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>().eq("PARK_NUM",order.getParkInfoId() ).eq("PARK_ID", order.getParkId()));
             orderService.releaseParkInfo(bsParkInfo.getFlowId(), order.getUserId());

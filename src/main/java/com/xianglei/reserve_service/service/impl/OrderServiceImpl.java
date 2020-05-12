@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @Auther: Xianglei
@@ -212,7 +209,6 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 } else {
                     num = parkInfoMapper.update(parkInfo, new UpdateWrapper<BsParkInfo>()
-                            .eq("TEMP_OWNER", tempOwner)
                             .eq("PARK_ID", parkInfo.getParkId())
                             .eq("PARK_NUM", parkInfoId));
                     index--;
@@ -276,6 +272,25 @@ public class OrderServiceImpl implements OrderService {
             parkInfo.setTempOwner(replace);
         }
         return parkInfoMapper.updateById(parkInfo);
+    }
+
+    @Override
+    public int checkOrderIsOk(Map<String, String> bsOrder) {
+        String startTime = bsOrder.get("startTime");
+        String leaveTime = bsOrder.get("leaveTime");
+        String now = DateUtils.getNow("yyyy-MM-dd");
+        startTime = now + " " + startTime + ":00";
+        leaveTime = now + " " + leaveTime + ":00";
+        List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
+                .eq("USER_ID", bsOrder.get("userId"))
+                .eq("PARK_INFO_ID", bsOrder.get("parkInfoId"))
+                .eq("PARK_ID", bsOrder.get("parkId"))
+                .eq("START_TIME", startTime)
+                .eq("LEAVE_TIME", leaveTime));
+        if (bsOrders != null && bsOrders.size() != 0) {
+            return 1;
+        }
+        return 0;
     }
 
 }

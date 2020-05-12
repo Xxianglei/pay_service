@@ -49,13 +49,24 @@ public class SubscribeOrderController {
         } else {
             int num = orderService.updateParkStatus(bsOrderMap);
             if (num != 0) {
-                baseJson.setStatus(true);
-                baseJson.setCode(200);
-                baseJson.setMessage("锁单成功");
-            } else {
-                baseJson.setStatus(false);
-                baseJson.setCode(500);
-                baseJson.setMessage("锁单失败");
+                if (num != 0) {
+                    // 二次校验订单是否存在
+                    int res = orderService.checkOrderIsOk(bsOrderMap);
+                    if (res != 0) {
+                        logger.error("二次校验用户更新订单失败");
+                        baseJson.setMessage("重复锁单失败");
+                        baseJson.setCode(500);
+                        baseJson.setStatus(false);
+                    } else {
+                        baseJson.setStatus(true);
+                        baseJson.setCode(200);
+                        baseJson.setMessage("锁单成功");
+                    }
+                } else {
+                    baseJson.setStatus(false);
+                    baseJson.setCode(500);
+                    baseJson.setMessage("锁单失败");
+                }
             }
         }
         return baseJson;

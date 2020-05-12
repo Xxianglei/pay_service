@@ -28,4 +28,11 @@ public interface OrderService {
     int insertOrder(BsOrder bsOrder);
 
     int releaseParkInfo(String flowId, String userId);
+
+    /**
+     * 二次校验
+     * @param bsOrder
+     * @return
+     */
+    int checkOrderIsOk(Map<String, String> bsOrder);
 }

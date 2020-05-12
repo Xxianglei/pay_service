@@ -49,3 +49,11 @@ rocketmq:
     group: producer_group
 mybatis:
   type-aliases-package: com.xianglei.reserve_service.domain
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS

@@ -71,7 +71,7 @@ public class ClientsOrderController {
     public BaseJson DeleteOrder(@RequestParam List<String> flowIds, @RequestParam String userId) {
         BaseJson baseJson = new BaseJson(false);
         try {
-            int nums = orderService.deleteOrders(flowIds,userId);
+            int nums = orderService.deleteOrders(flowIds, userId);
             baseJson.setMessage("删除成功");
             baseJson.setCode(200);
             baseJson.setData(nums);
@@ -95,7 +95,7 @@ public class ClientsOrderController {
             logger.error("用户Id不可为空");
             return new BaseJson(false, "用户Id不可为空");
         } else {
-            List<PreBsOrder>  myOrders = orderService.getMyOrders(userId, orderId);
+            List<PreBsOrder> myOrders = orderService.getMyOrders(userId, orderId);
             baseJson.setData(myOrders);
             baseJson.setCode(200);
             baseJson.setMessage("查询成功");
