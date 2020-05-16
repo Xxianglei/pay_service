@@ -35,4 +35,26 @@ public interface OrderService {
      * @return
      */
     int checkOrderIsOk(Map<String, String> bsOrder);
+
+    /**
+     * 临时停车
+     * @param bsOrderMap
+     * @return
+     */
+    int generateTempOrder(Map<String, String> bsOrderMap);
+
+    /**
+     * 获取临时订单
+     * @param bsOrderMap
+     * @return
+     */
+    int existTempOrder(Map<String, String> bsOrderMap);
+
+    /**
+     * 临时停车订单支付
+     * @param bsOrderMap
+     * @return
+     */
+    int updateOrder(Map<String, String> bsOrderMap);
+
 }

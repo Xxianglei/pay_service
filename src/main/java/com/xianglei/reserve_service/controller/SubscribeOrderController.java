@@ -32,7 +32,6 @@ public class SubscribeOrderController {
     @Autowired
     RedisUtil redisUtil;
 
-
     /**
      * 客户端下单第一步占用车位
      * 锁单成功后立马执行生成订单 发送消息队列
@@ -66,6 +65,51 @@ public class SubscribeOrderController {
                     baseJson.setStatus(false);
                     baseJson.setCode(500);
                     baseJson.setMessage("锁单失败");
+                }
+            }
+        }
+        return baseJson;
+    }
+
+    /**
+     * 扫描二维码临时停车
+     *
+     * @param bsOrderMap 车号  停车场id  用户id
+     * @return
+     */
+    @RequestMapping("/tempPark")
+    public BaseJson tempPark(@RequestBody Map<String, String> bsOrderMap) {
+        BaseJson baseJson = new BaseJson();
+        if (Tools.isNull(bsOrderMap)) {
+            baseJson.setMessage("参数错误");
+            baseJson.setCode(500);
+            baseJson.setStatus(false);
+        } else {
+            // 判断当前停车场是否有临时订单
+            if (orderService.existTempOrder(bsOrderMap) != 0) {
+                // 如果有临时订单  走支付  更新订单
+                int result = orderService.updateOrder(bsOrderMap);
+                if (result == 0) {
+                    logger.error("离开停车场支付失败");
+                    baseJson.setMessage("支付失败");
+                    baseJson.setCode(500);
+                    baseJson.setStatus(false);
+                } else {
+                    baseJson.setStatus(true);
+                    baseJson.setCode(200);
+                    baseJson.setMessage("支付成功");
+                }
+            }else{
+                int result = orderService.generateTempOrder(bsOrderMap);
+                if (result == 0) {
+                    logger.error("临时停车下订单失败");
+                    baseJson.setMessage("下单失败");
+                    baseJson.setCode(500);
+                    baseJson.setStatus(false);
+                } else {
+                    baseJson.setStatus(true);
+                    baseJson.setCode(200);
+                    baseJson.setMessage("下单成功");
                 }
             }
         }

@@ -1,7 +1,9 @@
 package com.xianglei.reserve_service.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.xianglei.reserve_service.common.BaseJson;
 import com.xianglei.reserve_service.common.DateEnum;
 import com.xianglei.reserve_service.common.OrderStatusEnum;
 import com.xianglei.reserve_service.common.utils.DateUtils;
@@ -16,6 +18,7 @@ import com.xianglei.reserve_service.mapper.ParkInfoMapper;
 import com.xianglei.reserve_service.mapper.ParkMapper;
 import com.xianglei.reserve_service.message.OrderProducer;
 import com.xianglei.reserve_service.service.OrderService;
+import com.xianglei.reserve_service.service.feigncall.AccountStrategy;
 import org.apache.commons.lang.StringUtils;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
@@ -44,6 +47,8 @@ public class OrderServiceImpl implements OrderService {
     OrderProducer orderProducer;
     @Autowired
     RedisUtil redisUtil;
+    @Autowired
+    AccountStrategy accountStrategy;
 
     @Transactional
     @Override
@@ -57,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
         BsParkInfo bsParkInfo = parkInfoMapper.selectOne(new QueryWrapper<BsParkInfo>()
                 .eq("PARK_NUM", parkInfoId)
                 .eq("PARK_ID", parkId));
-        if(Tools.isNotNull(bsParkInfo)){
+        if (Tools.isNotNull(bsParkInfo)) {
             releaseParkInfo(bsParkInfo.getFlowId(), userId);
         }
         return nums;
@@ -278,8 +283,8 @@ public class OrderServiceImpl implements OrderService {
     public int checkOrderIsOk(Map<String, String> bsOrder) {
         String startTime = bsOrder.get("startTime");
         String leaveTime = bsOrder.get("leaveTime");
-        startTime =  startTime + ":00";
-        leaveTime =  leaveTime + ":00";
+        startTime = startTime + ":00";
+        leaveTime = leaveTime + ":00";
         List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
                 .eq("USER_ID", bsOrder.get("userId"))
                 .eq("PARK_INFO_ID", bsOrder.get("parkInfoId"))
@@ -290,6 +295,120 @@ public class OrderServiceImpl implements OrderService {
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public int generateTempOrder(Map<String, String> bsOrderMap) {
+        BsOrder bsOrder = new BsOrder();
+        String parkId = bsOrderMap.get("parkId");
+        String carNum = bsOrderMap.get("carNum");
+        String userId = bsOrderMap.get("userId");
+        // 当前时间
+        Date createDate = new Date();
+        String formatCreateDate = DateUtil.format(createDate, "yyyy-MM-dd HH:mm:ss");
+        // 默认00点离开
+        String leaveDate = DateUtil.format(createDate, "yyyy-MM-dd") + " 23:30:00";
+        bsOrder.setFlowId(UUID.randomUUID().toString() + "TEMP");
+        bsOrder.setParkId(parkId);
+        bsOrder.setCarNum(carNum);
+        bsOrder.setLeaveTime(DateUtil.parse(leaveDate, "yyyy-MM-dd HH:mm:ss"));
+        bsOrder.setStartTime(DateUtil.parse(formatCreateDate, "yyyy-MM-dd HH:mm:ss"));
+        // 是否夜晚  按夜晚计费
+        bsOrder.setEvening("1");
+        // 是否支付 未支付  离开得时候支付
+        bsOrder.setCharge("0");
+        bsOrder.setUserId(userId);
+        // 找一个全天没有使用的车位
+        List<BsParkInfo> bsParkInfos = parkInfoMapper.selectList(new QueryWrapper<BsParkInfo>().eq("PARK_ID", parkId));
+        Iterator<BsParkInfo> iterator = bsParkInfos.iterator();
+        while (iterator.hasNext()) {
+            BsParkInfo next = iterator.next();
+            // 车位编号
+            String parkNum = next.getParkNum();
+            // 找到当天停车场被使用的车位  需要过滤掉
+            List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
+                    .eq("PARK_ID", parkId)
+                    .eq("PARK_INFO_ID", parkNum)
+            );
+            if (Tools.isNotEmpty(bsOrders)) {
+                iterator.remove();
+            }
+        }
+        // 推荐一个空闲车位
+        BsParkInfo bsParkInfo = bsParkInfos.get(0);
+        // 设置车位号
+        bsOrder.setParkInfoId(bsParkInfo.getParkNum());
+        // 保存
+        int insert = orderMapper.insert(bsOrder);
+        int i = 0;
+        // 设置订单的价位
+        BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
+        if (priceByOrder.isStatus() && priceByOrder.getData() != null) {
+            Double data = (Double) priceByOrder.getData();
+            bsOrder.setPrice(data);
+            i = orderMapper.updateById(bsOrder);
+        } else {
+            bsOrder.setPrice(100.00);
+            i = orderMapper.updateById(bsOrder);
+            throw new RuntimeException("远程调用计算价格失败");
+        }
+        if (insert != 0 && i != 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    }
+
+    @Override
+    public int existTempOrder(Map<String, String> bsOrderMap) {
+        String parkId = bsOrderMap.get("parkId");
+        String carNum = bsOrderMap.get("carNum");
+        String userId = bsOrderMap.get("userId");
+        int res = 0;
+        List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>().eq("PARK_ID", parkId).eq("CAR_NUM", carNum).eq("USER_ID", userId).eq("CHARGE", "0"));
+
+        for (BsOrder bsOrder : bsOrders) {
+            String flowId = bsOrder.getFlowId();
+            if (flowId.contains("TEMP")) {
+                res = 1;
+            }
+        }
+        return res;
+    }
+
+    @Transactional
+    @Override
+    public int updateOrder(Map<String, String> bsOrderMap) {
+        String parkId = bsOrderMap.get("parkId");
+        String carNum = bsOrderMap.get("carNum");
+        String userId = bsOrderMap.get("userId");
+        // 同一个停车场同一个人只能有一个待支付的临时订单
+        BsOrder bsOrder = orderMapper.selectOne(new QueryWrapper<BsOrder>()
+                .eq("PARK_ID", parkId)
+                .eq("CAR_NUM", carNum)
+                .eq("USER_ID", userId)
+                .eq("CHARGE", "0")
+                .like("FLOW_ID", "TEMP"));
+        Date leaveDate = new Date();
+        String leaveTime = DateUtil.format(leaveDate, "yyyy-MM-dd HH:mm:ss");
+        // 更新离开时候和是否夜晚
+        bsOrder.setLeaveTime(DateUtil.parse(leaveTime, "yyyy-MM-dd HH:mm:ss"));
+        if (leaveTime.compareTo("18:00") > 0) {
+            bsOrder.setEvening("0");
+        }
+        // 获取新的价格  更新即可
+        int i = 0;
+        BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
+        if (priceByOrder.isStatus() && priceByOrder.getData() != null) {
+            Double data = (Double) priceByOrder.getData();
+            bsOrder.setPrice(data);
+            bsOrder.setCharge("1");
+            i = orderMapper.updateById(bsOrder);
+        } else {
+            throw new RuntimeException("远程调用计算价格失败");
+        }
+        return i;
     }
 
 }
