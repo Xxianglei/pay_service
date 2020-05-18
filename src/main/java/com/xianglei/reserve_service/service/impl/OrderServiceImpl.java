@@ -297,6 +297,7 @@ public class OrderServiceImpl implements OrderService {
         return 0;
     }
 
+    @Transactional
     @Override
     public int generateTempOrder(Map<String, String> bsOrderMap) {
         BsOrder bsOrder = new BsOrder();
@@ -320,40 +321,44 @@ public class OrderServiceImpl implements OrderService {
         bsOrder.setUserId(userId);
         // 找一个全天没有使用的车位
         List<BsParkInfo> bsParkInfos = parkInfoMapper.selectList(new QueryWrapper<BsParkInfo>().eq("PARK_ID", parkId));
-        Iterator<BsParkInfo> iterator = bsParkInfos.iterator();
-        while (iterator.hasNext()) {
-            BsParkInfo next = iterator.next();
-            // 车位编号
-            String parkNum = next.getParkNum();
-            // 找到当天停车场被使用的车位  需要过滤掉
-            List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
-                    .eq("PARK_ID", parkId)
-                    .eq("PARK_INFO_ID", parkNum)
-            );
-            if (Tools.isNotEmpty(bsOrders)) {
-                iterator.remove();
+        if (bsParkInfos.size() > 0) {
+            Iterator<BsParkInfo> iterator = bsParkInfos.iterator();
+            while (iterator.hasNext()) {
+                BsParkInfo next = iterator.next();
+                // 车位编号
+                String parkNum = next.getParkNum();
+                // 找到当天停车场被使用的车位  需要过滤掉
+                List<BsOrder> bsOrders = orderMapper.selectList(new QueryWrapper<BsOrder>()
+                        .eq("PARK_ID", parkId)
+                        .eq("PARK_INFO_ID", parkNum)
+                );
+                if (Tools.isNotEmpty(bsOrders)) {
+                    iterator.remove();
+                }
             }
-        }
-        // 推荐一个空闲车位
-        BsParkInfo bsParkInfo = bsParkInfos.get(0);
-        // 设置车位号
-        bsOrder.setParkInfoId(bsParkInfo.getParkNum());
-        // 保存
-        int insert = orderMapper.insert(bsOrder);
-        int i = 0;
-        // 设置订单的价位
-        BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
-        if (priceByOrder.isStatus() && priceByOrder.getData() != null) {
-            Double data = (Double) priceByOrder.getData();
-            bsOrder.setPrice(data);
-            i = orderMapper.updateById(bsOrder);
-        } else {
-            bsOrder.setPrice(100.00);
-            i = orderMapper.updateById(bsOrder);
-            throw new RuntimeException("远程调用计算价格失败");
-        }
-        if (insert != 0 && i != 0) {
-            return 1;
+            // 推荐一个空闲车位
+            BsParkInfo bsParkInfo = bsParkInfos.get(0);
+            // 设置车位号
+            bsOrder.setParkInfoId(bsParkInfo.getParkNum());
+            // 保存
+            int insert = orderMapper.insert(bsOrder);
+            int i = 0;
+            // 设置订单的价位
+            BaseJson priceByOrder = accountStrategy.getPriceByOrder(bsOrder.getFlowId());
+            if (priceByOrder.isStatus() && priceByOrder.getData() != null) {
+                Double data = (Double) priceByOrder.getData();
+                bsOrder.setPrice(data);
+                i = orderMapper.updateById(bsOrder);
+            } else {
+                bsOrder.setPrice(100.00);
+                i = orderMapper.updateById(bsOrder);
+                throw new RuntimeException("远程调用计算价格失败");
+            }
+            if (insert != 0 && i != 0) {
+                return 1;
+            } else {
+                return 0;
+            }
         } else {
             return 0;
         }

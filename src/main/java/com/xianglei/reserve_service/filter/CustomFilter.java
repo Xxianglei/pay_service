@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Component
-@WebFilter(urlPatterns = {"/subOrder/**"},filterName = "customFilter")
+@WebFilter(urlPatterns = {"/subOrder/lockOrder"},filterName = "customFilter")
 public class CustomFilter implements Filter {
     private Logger log = LoggerFactory.getLogger(CustomFilter.class);
     @Override

@@ -28,6 +28,6 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         InterceptorRegistration interceptorRegistration = registry.addInterceptor(queueInterceptor);
-        interceptorRegistration.addPathPatterns("/subOrder/**");
+        interceptorRegistration.addPathPatterns("/subOrder/lockOrder");
     }
 }
