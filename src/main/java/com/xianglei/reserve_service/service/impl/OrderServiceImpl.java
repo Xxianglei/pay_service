@@ -297,7 +297,6 @@ public class OrderServiceImpl implements OrderService {
         return 0;
     }
 
-    @Transactional
     @Override
     public int generateTempOrder(Map<String, String> bsOrderMap) {
         BsOrder bsOrder = new BsOrder();
@@ -348,12 +347,10 @@ public class OrderServiceImpl implements OrderService {
             if (priceByOrder.isStatus() && priceByOrder.getData() != null) {
                 Double data = (Double) priceByOrder.getData();
                 bsOrder.setPrice(data);
-                i = orderMapper.updateById(bsOrder);
             } else {
                 bsOrder.setPrice(100.00);
-                i = orderMapper.updateById(bsOrder);
-                throw new RuntimeException("远程调用计算价格失败");
             }
+            i = orderMapper.updateById(bsOrder);
             if (insert != 0 && i != 0) {
                 return 1;
             } else {
